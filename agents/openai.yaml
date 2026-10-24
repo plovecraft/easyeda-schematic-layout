@@ -1,0 +1,4 @@
+interface:
+  display_name: "原理图排版与校验"
+  short_description: "按功能模板紧凑整理原理图，自动避让标签并检查实际连通关系"
+  default_prompt: "使用 $easyeda-schematic-layout 整理我的原理图，先生成紧凑、清晰的离线预览，再通过 EDA 接口写入并回读检查。"

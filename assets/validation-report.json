@@ -1,0 +1,16 @@
+{
+  "version": "1.0.1",
+  "evidenceClass": "synthetic fixtures only",
+  "unitTests": {
+    "run": 28,
+    "passed": 28
+  },
+  "syntheticDemo": {
+    "parts": 6,
+    "pins": 21,
+    "pages": 3
+  },
+  "privateProjectDataIncluded": false,
+  "liveEdaTouched": false,
+  "hardwareVerified": false
+}
