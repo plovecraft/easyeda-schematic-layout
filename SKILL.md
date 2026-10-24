@@ -2,7 +2,7 @@
 name: easyeda-schematic-layout
 description: 根据真实元件、引脚与 SVG 文字边界，使用功能模板、标签避让和矩形装箱紧凑整理嘉立创 EDA 原理图，并独立检查连接、NC、短接和版面。适用于原理图太乱、标签重叠、多页整理、统一绘图风格与排版算法复用；实际编辑需可用的 EDA 接口。不负责 PCB 自动布线。
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # 原理图排版与校验
@@ -42,6 +42,7 @@ python scripts/layout.py validate --source ./source.json --candidate ./candidate
 - 纯排版保留 `uniqueId`、库资产、封装、值、引脚、网名和 NC。跨页重建需要身份映射及 PCB 关联检查。
 - 原始观测、目标网表、候选和实际回读分别保存。电气修复记录原网络、目标网络与依据，不改写原始导出或测量结果。
 - 文字边界来自本地浏览器对原生 SVG 的 `getBBox()`。缺字体先处理，不能用字符数估计冒充实测。基线与固定引脚文字接触只允许明确、有限、留痕的例外。
+- 新工程先核对 GND 文字样式；不同于默认模型时用 `calibrate-ground` 读取至少两个原生样本，在派生测量文件中提供 `nativeGroundLabelProfile`。不改原始导图或测量来掩盖差异。
 - `conform` 仅自动处理同向垂直引脚接水平总线这一类情况；其他情况修模板。
 - Python 不使用 `-O`。离线通过、真实回读通过、保存重载、DRC 和硬件验证分别报告。未验证纸张尺寸时标明自由画布。
 

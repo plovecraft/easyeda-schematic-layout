@@ -20,6 +20,7 @@ from layout_engine.packing import pack
 from layout_engine.combine import combine
 from layout_engine.pipeline import conform
 from layout_engine.geometry import shift,box
+from layout_engine.drawing import native_ground,calibrate_ground_label
 from install_skill import verify as verify_checksums
 import hashlib
 
@@ -62,6 +63,37 @@ class LayoutChecks(unittest.TestCase):
         report=validate(self.source,plan,self.policy)
         self.assertFalse(report['passed'])
         self.assertIn(kind,{r['type'] for r in report['errors']})
+
+    def ground_profile_fixture(self,folder,inconsistent=False):
+        components=[];attrs=[];elements=[]
+        for i,(x,y) in enumerate([(100,100),(200,200)]):
+            components.append(dict(primitiveId='g'+str(i),componentType='netflag',net='GND',x=x,y=y,rotation=0,bbox=asbox(ground_box(dict(point=(x,y),rotation=0,nativeGlyph=True)))))
+            attrs.append(dict(primitiveId='a'+str(i),ParentPrimitiveId='g'+str(i),Key='Name',Value='GND',ValueVisible=True,Rotation=0))
+            elements.append(dict(id='a'+str(i),tag='text',text='GND',bbox=asbox((x-9+(10 if inconsistent and i else 0),y-30,x+9,y-22))))
+        snapshot=folder/'native.json';measurement=folder/'measurement.json'
+        save_json(snapshot,dict(result=dict(components=components,pagePrimitives=dict(attributes=attrs))))
+        save_json(measurement,dict(elements=elements))
+        return snapshot,measurement
+
+    def test_measured_ground_style_matches_multiple_native_samples(self):
+        with tempfile.TemporaryDirectory() as temp:
+            snapshot,measurement=self.ground_profile_fixture(Path(temp))
+            before=(snapshot.read_bytes(),measurement.read_bytes())
+            profile=calibrate_ground_label(snapshot,measurement)
+            ground=native_ground(dict(id='g',point=(200,200),rotation=0),{'GND':dict(width=18,height=8,bearingX=0,bearingY=0)},profile)
+            self.assertEqual(ground['label']['bbox'],load_json(measurement)['elements'][1]['bbox'])
+            self.assertEqual(before,(snapshot.read_bytes(),measurement.read_bytes()))
+
+    def test_inconsistent_native_ground_styles_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            paths=self.ground_profile_fixture(Path(temp),inconsistent=True)
+            with self.assertRaises(ValueError):calibrate_ground_label(*paths)
+
+    def test_ground_profile_refuses_uncalibrated_rotation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            profile=calibrate_ground_label(*self.ground_profile_fixture(Path(temp)))
+            with self.assertRaises(ValueError):
+                native_ground(dict(id='g',point=(0,0),rotation=90),{'GND':dict(width=18,height=8)},profile)
 
     def test_all_three_pages_pass_and_keep_every_pin(self):
         pins=0

@@ -1,5 +1,5 @@
 """Functional drawing grammar; measured native positive Y-up rotations."""
-import copy
+import copy,math
 from .geometry import *
 from .model import pose,pinmap
 from .labels import place_part_labels,NoLayout
@@ -73,13 +73,45 @@ class NativeDrawing(Drawing):
         # Converted in finish_ground_geometry after ordinary captions are laid out.
         super().ground(name,point,rotation)
 
-def native_ground(m,metrics):
+def native_ground(m,metrics,profile=None):
     n=copy.deepcopy(m);n['nativeGlyph']=True;x,y=n['point'];rot=n.get('rotation',0);t=metrics['GND'];w,h=t['width'],t['height']
-    ub=(x+11,y-10,x+11+w,y-10+h)
+    if profile is not None:
+        if profile.get('rotation')!=0 or rot%360!=0:
+            raise ValueError('Measured ground-label profile supports only its calibrated zero-degree orientation')
+        bb=box(profile['relativeBBox'])
+        if not all(math.isfinite(v) for v in bb) or bb[2]<=bb[0] or bb[3]<=bb[1]:
+            raise ValueError('Invalid measured ground-label envelope')
+        if abs((bb[2]-bb[0])-w)>.03 or abs((bb[3]-bb[1])-h)>.03:
+            raise ValueError('Ground-label profile does not match the current measured font')
+        ub=shift(bb,x,y);n['groundLabelProfile']=copy.deepcopy(profile)
+    else:ub=(x+11,y-10,x+11+w,y-10+h)
     n['label']=dict(id=n['id']+'-name',text='GND',bbox=asbox(rotate_box(ub,rot,(x,y))),unrotatedBBox=asbox(ub),angle=rot,fontSize=7.006200555911909,bearingX=t['bearingX'],bearingY=t['bearingY'])
     return n
 
-def fit_native_grounds(page,metrics):
+def calibrate_ground_label(snapshot,measurements):
+    """Derive a zero-degree profile from multiple unmodified native SVG labels."""
+    from .model import load_json,sha256
+    raw=load_json(snapshot);r=raw.get('response',raw).get('result',{})
+    mm={e['id']:e for e in load_json(measurements)['elements'] if e['tag']=='text'}
+    samples=[]
+    for c in r['components']:
+        if c['componentType']!='netflag' or c.get('net')!='GND' or c['rotation']%360!=0:continue
+        if max(abs(a-b) for a,b in zip(box(c['bbox']),ground_box(dict(point=(c['x'],c['y']),rotation=0,nativeGlyph=True))))>1e-5:
+            raise ValueError('Ground glyph differs from the supported native body geometry')
+        attrs=[a for a in r['pagePrimitives']['attributes'] if a['ParentPrimitiveId']==c['primitiveId'] and a['Key']=='Name' and a.get('ValueVisible')]
+        if len(attrs)!=1 or attrs[0]['Value']!='GND' or attrs[0]['Rotation']%360!=0:
+            raise ValueError('Ground label is missing, ambiguous, or rotated')
+        t=mm[attrs[0]['primitiveId']]
+        if t['text']!='GND':raise ValueError('Measured ground-label text changed')
+        samples.append(shift(box(t['bbox']),-c['x'],-c['y']))
+    if len(samples)<2:raise ValueError('At least two measured zero-degree ground labels are required')
+    first=samples[0]
+    if any(max(abs(a-b) for a,b in zip(first,b))>.03 for b in samples[1:]):
+        raise ValueError('Ground labels have inconsistent native styles')
+    return dict(rotation=0,relativeBBox=asbox(first),sampleCount=len(samples),
+                snapshotSha256=sha256(snapshot),measurementSha256=sha256(measurements))
+
+def fit_native_grounds(page,metrics,profile=None):
     """Find short legal ground leads using actual 21-raw native glyph bounds.
 
     Unlike the earlier simplified preview, native ground text is an obstacle.
@@ -91,7 +123,7 @@ def fit_native_grounds(page,metrics):
     fixed=[box(t['bbox']) for p in page['parts'] for t in p['labels']+p['fixedTexts']]
     for old in oldgrounds:
         a=point(old['point']);preferred=old.get('rotation',0);choices=[]
-        for rot in dict.fromkeys((preferred,0,90,270,180)):
+        for rot in ([0] if profile is not None else dict.fromkeys((preferred,0,90,270,180))):
             v=rotate((0,-1),rot)
             for dist in range(0,201,5):
                 z=(a[0]+v[0]*dist,a[1]+v[1]*dist);choices.append((dist+(0 if rot==preferred else 25),rot,z,[a,z]))
@@ -104,7 +136,7 @@ def fit_native_grounds(page,metrics):
                             choices.append((dist+elbow+25,rot,end,[a,via,end]))
         best=None
         for cost,rot,z,path in sorted(choices,key=lambda x:(x[0],x[1],x[2])):
-            m=native_ground(dict(old,point=z,rotation=rot),metrics);obstacles=[ground_box(m),box(m['label']['bbox'])]
+            m=native_ground(dict(old,point=z,rotation=rot),metrics,profile);obstacles=[ground_box(m),box(m['label']['bbox'])]
             textboxes=fixed+[box(q['label']['bbox']) for q in page['markers'] if 'label' in q]
             markerboxes=[ground_box(q) for q in page['markers'] if q['kind']=='ground']
             if any(overlap(grow(b,.6),c)>EPS for b in obstacles for c in bodies+textboxes+markerboxes):continue

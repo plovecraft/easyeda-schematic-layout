@@ -43,6 +43,10 @@ def main():
     p.add_argument('--models',nargs='+',required=True,type=Path)
     p.add_argument('--measurements',nargs='+',required=True,type=Path)
     p.add_argument('--out',required=True,type=Path)
+    p=sub.add_parser('calibrate-ground',help='Derive ground-label envelope from multiple real native labels')
+    p.add_argument('--snapshot',required=True,type=Path)
+    p.add_argument('--measurements',required=True,type=Path)
+    p.add_argument('--out',required=True,type=Path)
     p=sub.add_parser('build',help='Functional grammar, label search, page packing, checks and preview')
     p.add_argument('--manifest',required=True,type=Path)
     p.add_argument('--out',required=True,type=Path)
@@ -88,6 +92,12 @@ def main():
         from layout_engine.combine import combine
         combine(args.models,args.measurements,args.out)
         print(args.out/'source.json')
+        return 0
+    if args.command=='calibrate-ground':
+        from layout_engine.drawing import calibrate_ground_label
+        profile=calibrate_ground_label(args.snapshot,args.measurements)
+        args.out.parent.mkdir(parents=True,exist_ok=True);save_json(args.out,profile)
+        print('Measured ground-label profile saved; original inputs unchanged')
         return 0
     if args.command=='build':
         # Refuse old output: a failed new run must not inherit an old success report.

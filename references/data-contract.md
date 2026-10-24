@@ -26,6 +26,16 @@ SVG 需包含每个原生元件 `c_partid="part"` 分组，组内 ID 能与 prim
 
 `measure` 输出 `elements`（原图包围盒）、`textMetrics`（7.0062 raw 字形）、`nativeLabelMetrics`（原生标签基线边界）、`annotationMetrics`（标题）。功能模板涉及的全部网名必须可测，不能用字符串长度兜底。
 
+不同工程可能把 GND 文字置于右侧或居中下方。先取得同一工程至少两个零度 GND 的原生快照及 SVG 实测，再运行：
+
+```powershell
+python scripts/layout.py calibrate-ground --snapshot ./actual/snapshot.json --measurements ./actual/measurements.json --out ./work/ground-profile.json
+```
+
+输出只包含相对符号连接点的 `relativeBBox`、`rotation:0`、样本数与输入文件哈希。多个样本的边界需一致；不修改输入。将该对象放到**新的派生测量文件**的 `nativeGroundLabelProfile` 字段，并让 manifest 的 `measurements` 引用派生文件。原始 SVG 和测量文件保持不变。
+
+提供 profile 后，接地搜索只采用已校准的零度方向；字形宽高仍必须与当前测量相符。未提供 profile 时保留原右侧文字模型，真实 EDA 使用前必须核对。其他朝向、字形本体、字号或不一致样式需要额外适配，不能通过放宽视觉校验接受未知差异。
+
 ## layout.json
 
 完整可运行示例由 `demo` 生成。顶层结构：

@@ -76,7 +76,7 @@ def build_module(source, spec, measurements):
         else:
             raise ValueError('Unknown marker kind')
     page = drawing.finish(dict(_flex=True, **spec.get('captionOptions', {})))
-    fit_native_grounds(page, measurements['textMetrics'])
+    fit_native_grounds(page, measurements['textMetrics'],measurements.get('nativeGroundLabelProfile'))
     policy = base_policy(subset, scopes, spec.get('requiredPhysicalPairs', []))
     policy.update(rotationConvention='native-positive', enforcePinExitDirection=True)
     # Numerical/native pin-caption exceptions are explicit inputs, never created
@@ -207,7 +207,7 @@ def build_project(manifest_path, output):
             raise ValueError('Rejected page '+page_id+'; see '+str(folder/'report.json'))
         summary.append(dict(id=page_id, title=config.get('title', page_id),
                             modules=[m['title'] for m in selected.values()], **report['metrics']))
-    result = dict(version='1.0.1', passed=True, status='offline-verified', pages=summary,
+    result = dict(version='1.0.2', passed=True, status='offline-verified', pages=summary,
                   parts=len(source['parts']), liveApplied=False, hardwareVerified=False,
                   nativePersistenceVerified=False, paperless=True)
     save_json(out/'report.json', result)
