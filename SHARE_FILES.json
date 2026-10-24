@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "version": "1.0.1",
   "files": [
+    ".gitattributes",
     ".gitignore",
     "README.md",
     "SHARE_FILES.json",
