@@ -2,6 +2,26 @@
 
 包含可安装的 skill、实际 Python 算法、中文技术说明和独立三页示例。Agent 根据电路制定功能模板，程序完成几何计算与检查，真实 EDA 读写通过 `easyeda-agent` 及其连接器执行。
 
+## 真实原理图前后对比
+
+下面三张图均由实际 EDA 工程导出，**左侧仅使用嘉立创 EDA 的 `easyeda-agent` skill，右侧在同一已保存电路上加入本排版算法**。基线经过正常绘图与审查；两侧保持电气连接、元件和字号，按同一坐标比例展示。
+
+这组独立测试包含 66 个元件、209 个引脚。三页合计几何直角折点从 125 个降至 18 个（减少 85.6%），内容包围面积减少 50.5%，图纸由 A3 / A4 / A3 调整为 A4 / A4 / A4。总线长减少 1.8%，其中第 2、3 页线长有所增加；算法会在面积、折点和线长间取舍。
+
+### 第 1 页：主控与调试
+
+![主控与调试原理图：左侧仅 EDA skill，右侧加入紧凑排版算法，同一坐标比例](examples/robot-controller/comparison-1.png)
+
+### 第 2 页：电源与电压采样
+
+![电源与电压采样原理图：左侧仅 EDA skill，右侧加入紧凑排版算法，同一坐标比例](examples/robot-controller/comparison-2.png)
+
+### 第 3 页：运动与传感器接口
+
+![运动与传感器接口原理图：左侧仅 EDA skill，右侧加入紧凑排版算法，同一坐标比例](examples/robot-controller/comparison-3.png)
+
+[查看比较方法、逐页指标与原生工程](examples/robot-controller/README.md)。可下载仓库后打开 [交互预览](examples/robot-controller/preview.html)，切换页面、适合窗口或原始比例。公开数据仅包括获准分享的独立测试工程；原有个人项目不在包内。本例用于验证原理图排版，原生检查仍有属性匹配等提示，未完成 PCB 和硬件验证。
+
 ## 安装 skill
 
 解压 ZIP，进入 `schematic-layout-optimizer` 文件夹，保留整个文件夹：

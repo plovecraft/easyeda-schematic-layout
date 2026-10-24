@@ -58,7 +58,7 @@
   },
   "name": "schematic-layout-optimizer",
   "privacyValidation": {
-    "contactSanitizerTests": 3,
+    "contactSanitizerTests": 4,
     "deepNestedSvgContactScan": true,
     "rawObservationsModified": false
   },

@@ -40,6 +40,7 @@
     "references/paper-sizing.md",
     "scripts/layout_engine/paper.py",
     "tests/test_paper.py",
+    "PUBLIC_DATA_SCOPE.md",
     "examples/robot-controller/source.json",
     "examples/robot-controller/measurements.json",
     "examples/robot-controller/layout-after.json",
@@ -99,7 +100,6 @@
     "examples/robot-controller/comparison-3.png",
     "examples/robot-controller/measure_metrics.py",
     "examples/robot-controller/README.md",
-    "examples/robot-controller/preview.html",
-    "PUBLIC_DATA_SCOPE.md"
+    "examples/robot-controller/preview.html"
   ]
 }
