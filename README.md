@@ -1,6 +1,8 @@
-# 原理图紧凑排版 · schematic-layout-optimizer 1.1.0
+# 原理图紧凑排版 · schematic-layout-optimizer 1.1.1
 
 包含可安装的 skill、实际 Python 算法、中文技术说明和独立三页示例。Agent 根据电路制定功能模板，程序完成几何计算与检查，真实 EDA 读写通过 `easyeda-agent` 及其连接器执行。
+
+Copyright (C) 2026 plovecraft · [GNU AGPLv3](LICENSE)（`AGPL-3.0-only`）· [版权与授权范围](COPYRIGHT.md) · [第三方说明](THIRD_PARTY_NOTICES.md)
 
 ## 真实原理图前后对比
 
@@ -144,6 +146,14 @@ python scripts/layout.py verify-native --snapshot ./actual/snapshot.json --candi
 只自动旋转完成测量、无固定内部文字的双引脚符号。镜像、特殊总线、层次端口和复杂多单元器件需要额外适配。原生 GND 图形按校准的 21 raw 宽度处理，换版本/字体/图形后需重新核对。1.0.2 新增 `calibrate-ground`：从至少两个原生 GND 标签测量其相对位置，支持工程默认的居中下方等文字样式；校准 profile 仅启用已测量的零度方向，详见数据契约。
 
 检查不代表电路设计正确、PCB 可制造或硬件功能通过；自由画布也不代表 A4/A3 打印范围已经检查。具体测试见 [验证记录](references/validation.md)。
+
+## 许可证与署名
+
+本项目原创代码、skill 指令、文档、测试及原创示例编排采用 **GNU Affero General Public License version 3 only（AGPL-3.0-only）**，署名为 **plovecraft**。完整条款见 [LICENSE](LICENSE)，具体范围见 [COPYRIGHT.md](COPYRIGHT.md)；第三方依赖、库符号、商标和其他既有素材保留各自权利，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+AGPLv3 允许商用和收费；复制、修改、分发及修改版网络服务应遵守相应的版权声明、修改说明和对应源码提供义务。本项目不另加“禁止商用”限制。软件按现状提供，不提供许可证范围外的担保。
+
+你自己的电路设计不会仅因使用本工具就自动适用 AGPL；如果复制了本项目受许可的模板或示例内容，应按实际包含的内容判断。以上是使用说明，完整权利和义务以许可证为准。引用项目时建议链接到 [官方仓库](https://github.com/plovecraft/schematic-layout-optimizer)。
 
 ## 分享
 

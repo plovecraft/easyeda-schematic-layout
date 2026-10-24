@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Synthetic teaching fixture. It contains no vendor asset IDs or real circuit."""
 import html,copy
 from pathlib import Path

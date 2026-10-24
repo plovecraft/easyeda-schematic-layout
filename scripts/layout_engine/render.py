@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Offline SVG preview preserving original measured component glyphs."""
 from pathlib import Path
 from lxml import etree

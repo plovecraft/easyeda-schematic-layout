@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 plovecraft
+// SPDX-License-Identifier: AGPL-3.0-only
 // Local files only: SVG measurement/rendering; no live EDA or browser-session access.
 const fs = require('fs');
 const path = require('path');

@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Choose the smallest supplied measured paper on which a valid packing fits."""
 import copy,math
 from .geometry import box,asbox,overlap,unionbox

@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Namespace logical IDs across pages without changing native instance identity."""
 import copy
 from lxml import etree

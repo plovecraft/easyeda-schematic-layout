@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Independent segment-level checker; does not use Router or its occupancy grid.
 
 An offline check of the retained page only, not native EDA or hardware acceptance.

@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Finite collision-free caption search; no live EDA operations."""
 from .geometry import *
 class NoLayout(RuntimeError): pass

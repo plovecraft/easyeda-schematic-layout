@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Measured paper fit behavior, with purely synthetic fixture geometry."""
 import copy,os,sys,tempfile,unittest
 from pathlib import Path

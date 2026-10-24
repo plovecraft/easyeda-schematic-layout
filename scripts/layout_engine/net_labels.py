@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Native wire-label placement on measured physical wire islands."""
 import copy,math
 from collections import defaultdict

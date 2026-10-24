@@ -2,10 +2,14 @@
 name: schematic-layout-optimizer
 description: 根据真实元件、引脚与 SVG 文字边界，使用功能模板、标签避让和矩形装箱紧凑整理嘉立创 EDA 原理图，并独立检查连接、NC、短接和版面。适用于原理图太乱、标签重叠、多页整理、统一绘图风格与排版算法复用；实际编辑需可用的 EDA 接口。不负责 PCB 自动布线。
 metadata:
-  version: "1.1.0"
+  version: "1.1.1"
+  author: "plovecraft"
+  license: "AGPL-3.0-only"
 ---
 
 # 原理图排版与校验
+
+Copyright (C) 2026 plovecraft。原创内容按 [AGPLv3](LICENSE) 授权；范围与第三方保留见 [COPYRIGHT.md](COPYRIGHT.md) 和 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 把用户认可的画法转为功能模板，用确定性几何算法生成并检查离线候选，再通过可用 EDA 接口落成可编辑工程。保留器件身份和电气意图；需要修短接时单独记录电气变更，不能把现有短接当作正确网表保留。
 

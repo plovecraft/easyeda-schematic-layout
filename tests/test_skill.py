@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Observable graph/geometry invariants and distribution behavior; never accesses EDA."""
 import copy
 import json

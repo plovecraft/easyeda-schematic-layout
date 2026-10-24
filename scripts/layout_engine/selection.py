@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Bounded, validated template alternatives; no component-type orientation bias."""
 import copy
 import math

@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Portable manifest adapter for the retained template/geometry algorithms."""
 import copy
 import math

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Offline skill CLI. Live EDA mutations belong to the separate EDA connector."""
 import argparse
 import importlib.util

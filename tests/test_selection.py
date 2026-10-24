@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Synthetic placement choices: orientation follows verified geometry, not part type."""
 import copy
 import os

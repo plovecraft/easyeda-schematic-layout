@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Rigid module transforms and best-short-side free-rectangle packing."""
 import copy,math
 from .geometry import *

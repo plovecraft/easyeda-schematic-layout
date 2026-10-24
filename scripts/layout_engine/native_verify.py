@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Independent verification of actual native readback and SVG geometry."""
 import copy
 from collections import defaultdict,Counter

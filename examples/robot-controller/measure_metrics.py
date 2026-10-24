@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Identical read-only geometry metrics for both native schematic exports.
 
 Input: components.list envelope, browser SVG getBBox JSON, original native SVG.

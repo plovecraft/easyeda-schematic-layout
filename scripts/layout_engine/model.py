@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Import immutable native snapshots and SVG text envelopes; never edits EDA."""
 import copy,hashlib,json
 from pathlib import Path

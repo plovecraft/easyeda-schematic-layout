@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Checksum-checked local skill installation; no network or overwrite."""
 import argparse
 import hashlib

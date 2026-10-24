@@ -1,11 +1,14 @@
 {
   "schemaVersion": 1,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "files": [
     ".gitattributes",
     ".gitignore",
     "README.md",
     "SHARE_FILES.json",
+    "THIRD_PARTY_NOTICES.md",
+    "COPYRIGHT.md",
+    "LICENSE",
     "SKILL.md",
     "requirements.txt",
     "agents/openai.yaml",

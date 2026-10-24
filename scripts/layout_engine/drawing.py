@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Functional drawing grammar; measured native positive Y-up rotations."""
 import copy,math
 from .geometry import *

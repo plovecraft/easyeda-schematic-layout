@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 plovecraft
+# SPDX-License-Identifier: AGPL-3.0-only
 """Require a real outward lead before a schematic wire bends or branches."""
 import copy
 from .geometry import point,onseg,intersection
