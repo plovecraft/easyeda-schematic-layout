@@ -69,7 +69,9 @@ def verify_graph(raw,plan,policy):
         if a['Key']=='Name' and a['ParentPrimitiveId'] in wire_ids and a.get('ValueVisible') and a.get('Value'):
             rr=roots(point((a['X'],a['Y'])));assert len(rr)==1,('orphan/ambiguous label',a)
             root=next(iter(rr));names[root].add(a['Value']);labels.append(a)
-    flags=[c for c in r['components'] if c['componentType']!='part']
+    # Native paper/title-block components are non-electrical. Their bounds and
+    # title fields are checked separately; they must never count as net flags.
+    flags=[c for c in r['components'] if c['componentType'] not in ('part','sheet')]
     assert len(flags)==sum(m['kind']=='ground' for m in plan['markers'])
     matched_flags={};remaining=flags.copy()
     for m in [m for m in plan['markers'] if m['kind']=='ground']:
@@ -98,6 +100,7 @@ def verify_graph(raw,plan,policy):
     return report,dict(segments=ss,matchedFlags=matched_flags,matchedLabels=matched_labels,parts=actual,pins=pins)
 
 def verify_render(raw,plan,policy,svg_path,measurement_path,graph):
+    from lxml import etree
     actual_page=import_page(raw,svg_path,measurement_path) if isinstance(raw,(str,Path)) else None
     # import_page needs the retained raw file; all measurements remain immutable.
     assert actual_page is not None
@@ -125,7 +128,11 @@ def verify_render(raw,plan,policy,svg_path,measurement_path,graph):
         assert tid in mm,('rendered marker text missing',m['id'],tid);match(m['label'],mm[tid],m['id'])
     # Frame font metrics are verified from the actual render and occupancy,
     # without assuming SDK text height equals its raw fontSize argument.
-    rest=[v for tid,v in mm.items() if tid not in used]
+    # The native exporter owns paper/table lettering. Keep all of it in the
+    # collision checks, while distinguishing it from planned module titles.
+    root=etree.parse(str(svg_path)).getroot()
+    sheet_text_ids={e.get('id') for group in root.iter() if group.get('c_partid')=='sheet' for e in group.iter() if etree.QName(e).localname=='text'}
+    rest=[v for tid,v in mm.items() if tid not in used and tid not in sheet_text_ids]
     assert Counter(v['text'] for v in rest)==Counter(f['title'] for f in plan['frames']),('unexpected or missing visible text',[v['text'] for v in rest])
     texts=list(mm.values());text_collisions=[];wire_collisions=[];body_collisions=[];allowed=[];numeric_contacts=[]
     fixed={t['id']:p['ref'] for p in actual_page['parts'] for t in p['fixedTexts']}
@@ -157,4 +164,4 @@ def verify_render(raw,plan,policy,svg_path,measurement_path,graph):
                 if n==q['net'] and pt in (a,b) and intrude<=row['maxLeadIntrusion']:okay=True
             if okay:allowed.append((t['id'],i))
             else:wire_collisions.append((t['id'],i,n))
-    return dict(passed=not(text_collisions or wire_collisions or body_collisions),textsChecked=len(texts),maximumExpectedTextEnvelopeDelta=envelope_delta,textOverlaps=text_collisions,wireTextContacts=wire_collisions,textBodyContacts=body_collisions,nativeOwnBaselineAndPinCaptionContacts=allowed,nativeFixedTextBoundaryRoundingContacts=numeric_contacts,measurement='actual unmodified native SVG, fresh Chrome getBBox',svgSha256=sha256(svg_path),snapshotSha256=sha256(raw))
+    return dict(passed=not(text_collisions or wire_collisions or body_collisions),textsChecked=len(texts),nativeSheetTextsChecked=len(sheet_text_ids),maximumExpectedTextEnvelopeDelta=envelope_delta,textOverlaps=text_collisions,wireTextContacts=wire_collisions,textBodyContacts=body_collisions,nativeOwnBaselineAndPinCaptionContacts=allowed,nativeFixedTextBoundaryRoundingContacts=numeric_contacts,measurement='actual unmodified native SVG, fresh Chrome getBBox; title field values and paper bounds require separate native readback',svgSha256=sha256(svg_path),snapshotSha256=sha256(raw))

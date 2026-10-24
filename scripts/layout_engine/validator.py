@@ -49,6 +49,17 @@ def validate(before,page,policy=None):
         original_text={t['id']:t['text'] for t in old[pid]['labels']+old[pid]['fixedTexts']}
         actual_text={t['id']:t['text'] for t in p['labels']+p['fixedTexts']}
         if original_text!=actual_text:fail('visible-text-changed',ref=p['ref'])
+        dx,dy=p['x']-old[pid]['x'],p['y']-old[pid]['y']
+        if point(p.get('translation',[0,0]))!=point((dx,dy)):
+            fail('glyph-translation-mismatch',ref=p['ref'])
+        original_geometry={t['id']:t for t in old[pid]['labels']+old[pid]['fixedTexts']}
+        for category in ('labels','fixedTexts'):
+            for t in p[category]:
+                if t['id'] not in original_geometry:continue
+                tx,ty=t.get('translation',[0,0]) if category=='labels' else (0,0)
+                expected_text=shift(box(original_geometry[t['id']]['bbox']),dx+tx,dy+ty)
+                if any(abs(a-b)>1e-5 for a,b in zip(box(t['bbox']),expected_text)):
+                    fail('text-envelope-transform-mismatch',ref=p['ref'],text=t['id'])
         for key in immutable:
             if p['native'].get(key)!=old[pid]['native'].get(key):fail('component-identity-changed',ref=p['ref'],field=key)
         original={q['pinNumber']:q for q in old[pid]['pins']}
@@ -91,6 +102,15 @@ def validate(before,page,policy=None):
         elif hit==('overlap',) or hit in (a,b,c,d):fail('foreign-net-contact',segments=[i,j],nets=[n,m],point=hit)
         else:cross.add((tuple(sorted((n,m))),hit))
     all_text=texts(page);text_overlaps=[];wire_text=[];body_text=[];inherited_pin_caption_contacts=[];native_label_baselines=[];native_text_rounding=[]
+    for m in page.get('markers',[]):
+        if 'label' not in m:continue
+        t=m['label']
+        if t.get('fontSize')!=7.006200555911909:
+            fail('marker-font-changed',marker=m['id'])
+        if m.get('nativeLabel'):
+            metric=t.get('nativeMetrics');x,y=m['point']
+            if not metric or any(abs(t['bbox'][key]-(metric[key]+(x if key.endswith('X') else y)))>1e-5 for key in ('minX','minY','maxX','maxY')):
+                fail('native-label-envelope-mismatch',marker=m['id'])
     for i,j in combinations(range(len(all_text)),2):
         a,b=all_text[i],all_text[j];area=overlap(box(a['bbox']),box(b['bbox']))
         if area>EPS:

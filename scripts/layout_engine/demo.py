@@ -1,11 +1,11 @@
 """Synthetic teaching fixture. It contains no vendor asset IDs or real circuit."""
-import html
+import html,copy
 from pathlib import Path
 from .geometry import asbox
 from .model import save_json,import_page
 
 
-def create(out,browser):
+def create(out,browser,compare_placements=False):
     out=Path(out)
     if out.exists() and any(out.iterdir()):
         raise ValueError('Demo output must be new or empty')
@@ -70,6 +70,18 @@ def create(out,browser):
     model=import_page(out/'synthetic_snapshot.json',out/'synthetic_source.svg',out/'measurements.json')
     model['evidenceClass']='synthetic teaching fixture; not a real device or verified EDA project'
     save_json(out/'source.json',model)
+    if compare_placements:
+        for i,module in enumerate(modules,1):
+            core='U'+str(i);cap='C'+str(i)
+            horizontal_x=-80 if i!=2 else -360
+            module['variants']=[dict(id='horizontal',positions={cap:[horizontal_x,90]},rotations={cap:270},
+                wires=[dict(net='3V3',points=[[core,'3'],[0,90],[cap,'1']])],
+                markers=[dict(id='supply'+str(i),kind='label',net='3V3',point=[-40,90])])]
+            if i==1:
+                module['positions'][cap]=[-340,85]
+                module['wires']=[dict(net='3V3',points=[[core,'3'],[0,110],[-340,110],[cap,'1']])]
+            if i==3:
+                module['variants'].append(dict(id='invalid-overlap',positions={cap:[0,0]}))
     manifest=dict(schemaVersion=1,source='source.json',measurements='measurements.json',modules=modules,
                   pages=[dict(id=str(i),title=t,widths=[650,800],maxHeight=2000) for i,t in enumerate(titles,1)])
     save_json(out/'layout.json',manifest)

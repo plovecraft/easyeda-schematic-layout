@@ -108,7 +108,10 @@ def combine_policy(policies):
 
 def packed_page(modules, config, annotation_metrics=None):
     annotation_metrics=annotation_metrics or {}
-    sizes, local = {}, {}
+    title_font=config.get('titleFontSize',12)
+    if isinstance(title_font,bool) or not isinstance(title_font,(int,float)) or not math.isfinite(title_font) or not 1<=title_font<=48:
+        raise ValueError('titleFontSize must be finite and between 1 and 48')
+    sizes, local, headers = {}, {}, {}
     for name, module in modules.items():
         b = bounds(module['candidate'])
         local[name] = (math.floor(b[0]/5)*5, math.floor(b[1]/5)*5,
@@ -116,11 +119,21 @@ def packed_page(modules, config, annotation_metrics=None):
         r = local[name]
         title=module['title']
         if title not in annotation_metrics:
-            raise ValueError('Missing measured module title; measure {text: title, fontSize: 12}: '+title)
-        sizes[name] = (max(r[2]-r[0]+40,math.ceil((annotation_metrics[title]['width']+40)/5)*5), r[3]-r[1]+60)
+            raise ValueError('Missing measured module title at the configured titleFontSize: '+title)
+        metric=annotation_metrics[title]
+        if metric['fontSize']!=title_font:
+            raise ValueError('Frame title measurement must match titleFontSize')
+        headers[name]=max(40,math.ceil((metric['height']+20)/5)*5)
+        sizes[name] = (max(r[2]-r[0]+40,math.ceil((metric['width']+40)/5)*5), r[3]-r[1]+headers[name]+20)
     order = list(modules)
     orders = [order, sorted(order, key=lambda n: -sizes[n][1]),
               sorted(order, key=lambda n: -sizes[n][0]*sizes[n][1])]
+    trials=config.get('packingOrderTrials',0)
+    if isinstance(trials,bool) or not isinstance(trials,int) or not 0<=trials<=256:
+        raise ValueError('packingOrderTrials must be an integer from 0 to 256')
+    if trials:
+        import hashlib
+        orders += [sorted(order,key=lambda n:hashlib.sha256((str(i)+':'+n).encode()).digest()) for i in range(trials)]
     default = max(600, max(w for w, h in sizes.values()))
     choices = []
     for width in config.get('widths', [default, default+150, default+300]):
@@ -138,14 +151,12 @@ def packed_page(modules, config, annotation_metrics=None):
     for name in order:
         x, y, w, h = placement[name]
         b = local[name]
-        moved = translated(modules[name]['candidate'], x+20-b[0], height-y-40-b[3])
+        moved = translated(modules[name]['candidate'], x+20-b[0], height-y-headers[name]-b[3])
         items.append(moved)
         frames.append(dict(id=name, title=modules[name]['title'],
             rect=asbox((x+5, height-y-h+5, x+w-15, height-y-5)), color='#AA00AA'))
         title=modules[name]['title'];metric=annotation_metrics[title]
-        if metric['fontSize']!=12:
-            raise ValueError('Frame titles must be measured at fontSize 12')
-        annotations.append(dict(id='frame-title-'+name,text=title,fontSize=12,
+        annotations.append(dict(id='frame-title-'+name,text=title,fontSize=title_font,
             bearingX=metric['bearingX'],bearingY=metric['bearingY'],
             bbox=asbox((x+15,height-y-12-metric['height'],x+15+metric['width'],height-y-12))))
     page = merged(items)
@@ -182,11 +193,15 @@ def build_project(manifest_path, output):
         raise ValueError('Different source pages reuse a page-local net on one target page; resolve the electrical scope explicitly')
     out = Path(output)
     out.mkdir(parents=True, exist_ok=True)
-    modules = {}
+    modules = {};selections=[]
     for spec in specs:
         folder = out / 'modules' / safe_name(spec['name'])
         folder.mkdir(parents=True, exist_ok=True)
-        before, candidate, policy, report = build_module(source, spec, measurements)
+        if 'variants' in spec:
+            from .selection import select_module
+            before,candidate,policy,report,selection=select_module(source,spec,measurements,folder)
+            selections.append(dict(module=spec['name'],selected=selection['selected'],score=selection['score'],weights=selection['weights'],candidateCount=len(selection['candidates'])))
+        else:before, candidate, policy, report = build_module(source, spec, measurements)
         save_case(folder, before, candidate, policy, report)
         if not report['passed']:
             raise ValueError('Rejected module '+spec['name']+'; see '+str(folder/'report.json'))
@@ -195,21 +210,27 @@ def build_project(manifest_path, output):
     page_configs = {str(p['id']): p for p in manifest['pages']}
     if len(page_configs) != len(manifest['pages']) or set(page_configs) != {m['page'] for m in modules.values()}:
         raise ValueError('Page IDs must be unique and exactly cover all used pages')
-    summary = []
+    summary = [];paper_selections=[]
     for page_id, config in page_configs.items():
         selected = {n: m for n, m in modules.items() if m['page'] == page_id}
-        before, candidate, policy, report = packed_page(selected, config, measurements.get('annotationMetrics'))
         folder = out/'pages'/safe_name(page_id)
         folder.mkdir(parents=True, exist_ok=True)
+        if 'papers' in config:
+            from .paper import select_paper
+            before,candidate,policy,report,choice=select_paper(selected,config,measurements.get('annotationMetrics'),folder/'paper-selection.json')
+            paper_selections.append(dict(page=page_id,**choice))
+        else:before, candidate, policy, report = packed_page(selected, config, measurements.get('annotationMetrics'))
         candidate['pageId'] = page_id
         save_case(folder, before, candidate, policy, report)
         if not report['passed']:
             raise ValueError('Rejected page '+page_id+'; see '+str(folder/'report.json'))
         summary.append(dict(id=page_id, title=config.get('title', page_id),
                             modules=[m['title'] for m in selected.values()], **report['metrics']))
-    result = dict(version='1.0.2', passed=True, status='offline-verified', pages=summary,
+    result = dict(version='1.1.0', passed=True, status='offline-verified', pages=summary,
                   parts=len(source['parts']), liveApplied=False, hardwareVerified=False,
-                  nativePersistenceVerified=False, paperless=True)
+                  nativePersistenceVerified=False, paperless=len(paper_selections)!=len(summary))
+    if selections:result['moduleSelections']=selections
+    if paper_selections:result['paperSelections']=paper_selections
     save_json(out/'report.json', result)
     write_viewer(out, result)
     return result

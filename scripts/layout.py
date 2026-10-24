@@ -29,6 +29,7 @@ def main():
     sub.add_parser('doctor',help='Check local dependencies; never connect to EDA')
     p=sub.add_parser('demo',help='Generate and lay out a synthetic three-page example')
     p.add_argument('--out',required=True,type=Path)
+    p.add_argument('--compare-placements',action='store_true',help='Compare supplied synthetic horizontal and vertical placements')
     for command in ('measure','render','check-preview'):
         p=sub.add_parser(command)
         p.add_argument('--input',required=True,type=Path)
@@ -77,7 +78,7 @@ def main():
     from layout_engine.pipeline import build_project,check_model
     if args.command=='demo':
         from layout_engine.demo import create
-        manifest=create(args.out,browser)
+        manifest=create(args.out,browser,compare_placements=args.compare_placements)
         report=build_project(manifest,args.out/'result')
         print(json.dumps(report,ensure_ascii=False,indent=2))
         return 0

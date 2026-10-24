@@ -1,6 +1,6 @@
 {
-  "name": "easyeda-schematic-layout-local-svg",
-  "version": "1.0.2",
+  "name": "schematic-layout-optimizer-local-svg",
+  "version": "1.1.0",
   "private": true,
   "description": "Optional offline SVG typography measurement and rendering",
   "dependencies": {"playwright": ">=1.40.0 <2"}

@@ -103,6 +103,33 @@ class LayoutChecks(unittest.TestCase):
             self.assertTrue(report['passed'],report['errors']);pins+=report['coverage']['pins']
         self.assertEqual(pins,21)
 
+    def test_text_envelope_cannot_be_shrunk(self):
+        page=copy.deepcopy(self.plan);t=page['parts'][0]['labels'][0]
+        t['bbox']['maxX']=t['bbox']['minX']+.01
+        self.rejected(page,'text-envelope-transform-mismatch')
+
+    def test_text_transform_must_match_measured_envelope(self):
+        page=copy.deepcopy(self.plan);t=page['parts'][0]['labels'][0]
+        t['translation'][0]+=10000
+        self.rejected(page,'text-envelope-transform-mismatch')
+
+    def test_network_text_cannot_use_tiny_font(self):
+        page=copy.deepcopy(self.plan);page['markers'][0]['label']['fontSize']=.01
+        self.rejected(page,'marker-font-changed')
+
+    def test_native_sheet_is_not_an_electrical_flag(self):
+        raw=native_fixture(self.plan)
+        raw['result']['components'].append(dict(primitiveId='paper',componentType='sheet'))
+        report,_=verify_graph(raw,self.plan,self.policy)
+        self.assertTrue(report['passed'])
+
+    def test_rigid_page_translation_includes_frames_and_titles(self):
+        from layout_engine.packing import translated
+        page=translated(self.plan,70,300)
+        for key,field in [('frames','rect'),('annotations','bbox')]:
+            for a,b in zip(self.plan[key],page[key]):
+                self.assertEqual(box(b[field]),shift(box(a[field]),70,300))
+
     def test_foreign_short_is_detected(self):
         page=copy.deepcopy(self.plan)
         a=next(q for p in page['parts'] if p['ref']=='U1' for q in p['pins'] if q['pinNumber']=='1')

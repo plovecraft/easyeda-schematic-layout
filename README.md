@@ -1,21 +1,21 @@
-# 原理图排版与校验 Skill · 1.0.2
+# 原理图紧凑排版 · schematic-layout-optimizer 1.1.0
 
 包含可安装的 skill、实际 Python 算法、中文技术说明和独立三页示例。Agent 根据电路制定功能模板，程序完成几何计算与检查，真实 EDA 读写通过 `easyeda-agent` 及其连接器执行。
 
 ## 安装 skill
 
-解压 ZIP，进入 `easyeda-schematic-layout` 文件夹，保留整个文件夹：
+解压 ZIP，进入 `schematic-layout-optimizer` 文件夹，保留整个文件夹：
 
 ```powershell
 python scripts/install_skill.py
 ```
 
-默认安装到 `$CODEX_HOME/skills/easyeda-schematic-layout`；未设置 `CODEX_HOME` 时用用户主目录下 `.codex/skills/easyeda-schematic-layout`。安装器验证校验清单，不联网、不覆盖已有 skill。也可手动把整个目录复制到该位置。
+默认安装到 `$CODEX_HOME/skills/schematic-layout-optimizer`；未设置 `CODEX_HOME` 时用用户主目录下 `.codex/skills/schematic-layout-optimizer`。安装器验证校验清单，不联网、不覆盖已有 skill。也可手动把整个目录复制到该位置。
 
 下一轮输入可调用；若客户端尚未刷新 skill 列表，重新打开对话或重载客户端：
 
 ```text
-使用 $easyeda-schematic-layout，跑自带三页示例，打开预览并说明检查结果。
+使用 $schematic-layout-optimizer，跑自带三页示例，打开预览并说明检查结果。
 ```
 
 其他支持目录式 skills 的客户端可手动安装到其对应目录；本包只提供 Codex 自动安装入口。
@@ -59,7 +59,19 @@ python -m unittest discover -s tests -v
 
 演示有 6 个合成元件、21 个引脚，用于验证安装和算法流程。三个教学模块沿用同一简化结构，不代表三种经过电气验证的真实电路。它不含厂商元件库，也不写入 EDA。
 
-测试默认读取 `layout-demo`；可用 `SCHEMATIC_TEST_DEMO` 指定别的演示目录。测试在临时目录中做故障注入，不修改真实工程。
+要试验元件摆放与减少折返，可运行：
+
+```powershell
+python scripts/layout.py demo --compare-placements --out ./placement-demo
+```
+
+该试验比较不同位置与允许朝向，并拒绝非法候选。规则不要求电容或其他元件必须横放，而是按完整可见面积、折点、线长和交叉选择合法方案；具体配置与限制见[紧凑摆放规则](references/compact-placement.md)。
+
+测试默认读取标准 `layout-demo`；`SCHEMATIC_TEST_DEMO` 仅用于改动了路径、未改动标准 fixture 几何的目录。不要把比较朝向的 demo 当作标准 fixture。测试在临时目录中做故障注入，不修改真实工程。
+
+## 真实库示例与前后对比
+
+[完整小车控制板](examples/robot-controller/README.md) 包含明确获准公开的全新测试工程、实际导图、截图与重算输入；原有个人工程不在包内。具体授权和清理边界见 [公开数据范围](PUBLIC_DATA_SCOPE.md)。它与合成单元测试分开标注；未完成硬件验证。
 
 ## 用在自己的工程
 
@@ -68,9 +80,10 @@ python -m unittest discover -s tests -v
 可以直接对 Agent 说：
 
 ```text
-使用 $easyeda-schematic-layout 整理当前原理图。
-保留电气连接，按“主控与接口 / 电源 / 按键与灯光”三页组织。
+使用 $schematic-layout-optimizer 整理当前原理图。
+保留电气连接，按功能组织页面。
 芯片外围分组，标签对齐，布局紧凑，引脚先向外引出再转弯。
+比较元件位置和允许朝向，优先对齐连接轴线，减少台阶与折返，不预设必须横放或竖放。
 先生成离线预览和检查报告，我认可后再写入候选工程。
 ```
 
@@ -114,6 +127,8 @@ python scripts/layout.py verify-native --snapshot ./actual/snapshot.json --candi
 
 ## 分享
 
-分享整个 ZIP 即可。文件按 `SHARE_FILES.json` 固定白名单收录，仅包含通用算法、文档和合成教学示例；不含真实项目名称、专用电路模板、网表、器件选型、截图、回读日志、工程统计、本机路径、账号或浏览器会话。第三方依赖另行安装。
+分享整个 ZIP 即可。文件按 `SHARE_FILES.json` 固定白名单收录，包含通用算法、文档、合成教学数据及已授权的独立公开测试示例。原有私人项目、本机路径、账号元数据和浏览器会话不在包内。第三方依赖另行安装。
 
 `CHECKSUMS.sha256` 用于核对意外损坏，不是数字签名。安装器只复制该清单所列文件，不带走本地依赖或试验输出。修改后分发应更新校验清单并记录新版本。
+
+纸张过大或页面太空时，先按[纸张选择规则](references/paper-sizing.md) 比较实际图框、可用区和标题栏；支持有限纸张候选与有上限的装箱顺序搜索，不固定所有工程的纸型。

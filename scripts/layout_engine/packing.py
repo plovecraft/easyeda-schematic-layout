@@ -22,6 +22,7 @@ def translated(page,dx,dy):
             m['label']['bbox']=asbox(shift(box(m['label']['bbox']),dx,dy))
             if 'unrotatedBBox' in m['label']:m['label']['unrotatedBBox']=asbox(shift(box(m['label']['unrotatedBBox']),dx,dy))
     for t in p.get('annotations',[]):t['bbox']=asbox(shift(box(t['bbox']),dx,dy))
+    for f in p.get('frames',[]):f['rect']=asbox(shift(box(f['rect']),dx,dy))
     for z in p.get('junctions',[]):z['point']=(z['point'][0]+dx,z['point'][1]+dy)
     return p
 

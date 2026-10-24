@@ -1,0 +1,1 @@
+{"passed":true,"parts":30,"pins":80,"physicalWireIslands":62,"wireSegments":72,"visibleWireNames":57,"groundFlags":5,"requiredPhysicalPairs":18,"coverage":"fresh actual pin nets, NC, identities, physical DSU, exact bidirectional interval coverage, required direct pairs; no planned net names used to infer actual wires"}

@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 import sys
 
-NAME='easyeda-schematic-layout'
+NAME='schematic-layout-optimizer'
 
 
 def verify(source):

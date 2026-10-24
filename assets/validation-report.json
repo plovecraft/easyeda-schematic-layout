@@ -1,9 +1,9 @@
 {
-  "version": "1.0.2",
-  "evidenceClass": "synthetic fixtures only",
+  "version": "1.1.0",
+  "evidenceClass": "synthetic unit tests plus separately identified authorized native demonstration",
   "unitTests": {
-    "run": 31,
-    "passed": 31
+    "run": 57,
+    "passed": 57
   },
   "syntheticDemo": {
     "parts": 6,
@@ -11,6 +11,56 @@
     "pages": 3
   },
   "privateProjectDataIncluded": false,
-  "liveEdaTouched": false,
-  "hardwareVerified": false
+  "liveEdaTouched": true,
+  "hardwareVerified": false,
+  "placementComparison": {
+    "evidenceClass": "synthetic fixture only",
+    "orientationPreference": "none",
+    "horizontalAndVerticalWinnersTested": true,
+    "invalidCandidatesRejected": true
+  },
+  "independentRetest": {
+    "tamperedTextCasesRejected": 3,
+    "syntheticAlternativesTried": 25,
+    "normalBuildRegressionObserved": false
+  },
+  "paperSelection": {
+    "syntheticTests": 8,
+    "independentForwardPassed": true,
+    "boundedPackingOrderTrials": 256,
+    "irregularFreeSpaceSearch": false,
+    "wholeLayoutCenteredInUsableRegion": true
+  },
+  "publicNativeRobotExample": {
+    "parts": 66,
+    "pins": 209,
+    "pages": 3,
+    "selectedPaper": "A4",
+    "smallerMeasuredPaperTested": "A5",
+    "savedReloaded": true,
+    "nativeGraphAndAllVisibleTextVerified": true,
+    "strictNativeGatePassed": false,
+    "hardwareVerified": false,
+    "baseline": "independent easyeda-agent skill only",
+    "sameActualBaselineImportedForAfter": true,
+    "paperBefore": [
+      "A3",
+      "A4",
+      "A3"
+    ],
+    "paperAfter": [
+      "A4",
+      "A4",
+      "A4"
+    ],
+    "functionalTitleFontRaw": 20,
+    "baselineFinalNameMoves": 15
+  },
+  "name": "schematic-layout-optimizer",
+  "privacyValidation": {
+    "contactSanitizerTests": 3,
+    "deepNestedSvgContactScan": true,
+    "rawObservationsModified": false
+  },
+  "publicDatasetScope": "Only newly generated robot-controller test plus generic synthetic fixtures; user explicitly authorized public test project data/screenshots."
 }

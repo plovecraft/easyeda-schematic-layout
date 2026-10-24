@@ -80,7 +80,9 @@ python scripts/layout.py calibrate-ground --snapshot ./actual/snapshot.json --me
 - 同名局部网从不同源页迁到同一目标页会被拒绝，需要先核清电气意图；不能仅为了通过检查自动改名或提升全局作用域。
 - `requiredPhysicalPairs` 编码“必须真正连线”的引脚对，例如电源去耦、配置电阻、反馈与滤波外围。同名标签不满足这些要求。
 - `captionOptions` 支持指定核心文字行 `_coreLabelY`、单元文字行 `_labelY`，或给某个位号指定 `left`；优先保持可读对齐。
-- 标题按 12 raw 实测并参与模块边界与碰撞检查。`pages` 决定模块归属和可尝试的画布宽度；不自动平衡电气页归属。
+- 标题默认按 12 raw 实测并参与模块边界与碰撞检查；page 可用 `titleFontSize` 保留其他字号（1..48 raw），测量文件必须提供该字号的真实标题几何，不能缩字后沿用旧测量。`pages` 决定模块归属和可尝试的画布宽度；不自动平衡电气页归属。
+- page 可提供实测 `papers` 比较纸张、可用矩形和图签禁布区，详见[纸张选择](paper-sizing.md)。`packingOrderTrials` 可设为 0..256，额外尝试由固定哈希生成的装箱顺序；默认 0 保留旧的三种顺序，不能由搜索耗尽推断纸张在数学上绝无可行解。
+- 模块可选 `variants` 与 `objective`：比较多个位置、允许朝向和路径，先过完整硬约束再评分。字段、示例、报告及局限见[紧凑摆放规则](compact-placement.md)。未提供时保持原有单模板流程。
 
 ## 候选与检查输出
 
